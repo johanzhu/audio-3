@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>audio visualizer 3</title>
+	</head>
+	<script type="text/javascript" src="lib/three.js" ></script>
+	<script type="text/javascript" src="lib/orbitcontrol.js" ></script>
+	<script type="text/javascript" src="lib/bas.js" ></script>
+	<script type="text/javascript" src="lib/preload.js" ></script>
+	<script type="text/javascript" src="js/world.js" ></script>
+	<script type="text/javascript" src="js/loader.js" ></script>
+	<script type="text/javascript" src="js/bccircle.js" ></script>
+	<script type="text/javascript" src="js/musicbar.js" ></script>
+	<script type="text/javascript" src="lib/TweenMax.min.js" ></script>
+	<script type="text/javascript" src="js/orientcontrol.js" ></script>
+	<script type="text/javascript" src="js/colordetector.js" ></script>
+	<script src="http://eruda.liriliri.io/eruda.min.js"></script>
+	<style>
+		html,body{
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+			background-color: #0A1827;
+			font-family: -apple-system, BlinkMacSystemFont, "PingFang SC","Helvetica Neue",STHeiti,"Microsoft Yahei",Tahoma,Simsun,sans-serif;
+		}
+		#play{
+			position: absolute;
+			display: none;
+			left: 50%;
+			top: 50%;
+			margin-left: -50px;
+			margin-top: -25px;
+			z-index: 999;
+			border: 2px solid black;
+			font-size: 30px;
+			width: 100px;
+			height: 50px;
+			text-align: center;
+			line-height: 50px;
+			cursor: pointer;
+			background-color: #FAFAD2;
+		}
+		#loading{
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			margin-left: -50px;
+			margin-top: -25px;
+			z-index: 999;
+			font-size: 30px;
+			width: 100px;
+			height: 50px;
+			text-align: center;
+			line-height: 50px;
+			color: lightgoldenrodyellow;
+			cursor: pointer;
+		}
+		#loadingBar{
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			margin-left: -60px;
+			margin-top: 30px;
+			z-index: 999;
+			font-size: 30px;
+			width: 0px;
+			height: 20px;
+			text-align: center;
+			line-height: 50px;
+			background-color: #B067E7;
+		}
+	</style>
+	<body>
+		<div id="play">Play</div>
+		<div id="loading">Loading...</div>
+		<div id="loadingBar"></div>
+		<script>
+			//eruda.init();
+			deBug = true;
+			
+			var world,
+				loader,
+				analyser,
+				sound,
+				world,
+				eventBus,
+				clock,
+				orientControl,
+				colorDetector;
+				
+			var musicBar;
+				
+			var isPlay = false;
+				
+			var playBtn = document.getElementById('play');
+			var loading = document.getElementById('loading');
+			var loadingBar = document.getElementById('loadingBar');
+			var color = '0xFFFFFF';
+			
+			eventBus = new THREE.EventDispatcher();
+			
+			clock = new THREE.Clock();
+			
+			colorDetector = new ColorDetector();
+			
+			orientControl = new OrientControl();
+			
+			world = new World();
+			
+			loader = new Loader(eventBus, onLoadComplete);
+			
+			var loadConfig = [
+			
+				{ url : './assets/point.png', id: 'point' }
+				
+			];
+			
+			var musicUrl = './assets/music.mp3';
+			
+			loader.loadAssets(loadConfig);
+			
+			loader.loadMusic(musicUrl);	
+			
+			function onLoadComplete() {
+				
+				loading.style.display = 'none';
+				
+				loadingBar.style.display = 'none';
+				
+				world.init();
+				
+				world.removeAxes();
+				
+				world.camera.position.z = 50;
+				
+				sound = loader.sound;
+				
+				analyser = loader.analyser;
+				
+				var bc = new BcCircle();
+				
+				world.scene.add(bc);
+				
+				musicBar = new MusicBar(loader);
+				
+				world.scene.add(musicBar);
+				
+				playBtn.onclick = function () {
+					
+					playBtn.style.display = 'none';
+					
+					isPlay = true;
+					
+					sound.play();
+					
+				}
+				
+				eventBus.addEventListener('color',function(e) {
+					
+					var color = new THREE.Color(e.color);
+					musicBar.color = color;
+					
+				});
+				
+				animate();
+				
+			}
+			
+				
+			function detectMusicEnd() {
+				
+				var isPlaying = sound.isPlaying ? true : false;
+				
+				if(!isPlaying) {
+					
+					isPlay = false;
+					
+					playBtn.style.display = 'block';
+					
+				}
+				
+			}
+			
+			function objectUpdate() {
+				
+				var speed = 0.1;
+				
+				musicBar.update(analyser.getFrequencyData());
+				
+				if(musicBar.position.x < orientControl.ix) musicBar.position.x += speed;
+				
+				if(musicBar.position.x > orientControl.ix) musicBar.position.x -= speed;
+				
+				if(musicBar.position.y < orientControl.iy) musicBar.position.y += speed;
+				
+				if(musicBar.position.y > orientControl.iy) musicBar.position.y -= speed;
+				
+				colorDetector.detect(musicBar.position);
+				
+			}
+			
+			function animate() {
+				
+				requestAnimationFrame(animate);
+				
+				objectUpdate();
+				
+				detectMusicEnd();
+				
+				world.render();
+				
+			}
+			
+		</script>
+	</body>
+</html>
