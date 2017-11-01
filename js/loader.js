@@ -8,7 +8,8 @@ function Loader(eventBus, onLoadComplete) {
 	
 	var loadNum = 2;
 	
-	this.progress = 0;
+	var total1 = 0;
+	var total2 = 0;
 	
 	eventBus.addEventListener('loaded',function() {
 			
@@ -65,7 +66,13 @@ function Loader(eventBus, onLoadComplete) {
 	function onProgress1() {
 		
 		var per = preload.progress * 50 ;
-		console.log(per);
+		
+		total1 = per;
+		
+		var p = total1 + total2 / 100 * 150;
+		
+		loadingBar.style.width = p + 'px';
+		
 	}
 	
 	this.loadMusic = function(musicUrl) {
@@ -101,7 +108,13 @@ function Loader(eventBus, onLoadComplete) {
 	function onProgress2(xhr) {
 		
 		var per = xhr.loaded/xhr.total * 50;
-		console.log(per);
+		
+		total2 = per;
+		
+		var p = total1 + total2 / 100 * 150;
+		
+		loadingBar.style.width = p + 'px';
+		
 	}
 	
 	

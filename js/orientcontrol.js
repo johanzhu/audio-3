@@ -22,7 +22,7 @@
 					
           // Set Input
           var ix = THREE.Math.mapLinear(x, -30, 30, -11, 11);
-          var iy = THREE.Math.mapLinear(y, 0, 90, 11, -11);
+          var iy = THREE.Math.mapLinear(y, 0, 50, 11, -11);
           
           if(ix > 11) ix = 11;
           if(ix < -11) ix = -11;
