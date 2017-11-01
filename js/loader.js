@@ -73,6 +73,8 @@ function Loader(eventBus, onLoadComplete) {
 		
 		loadingBar.style.width = p + 'px';
 		
+		loadingBar.innerHTML = (total1 + total2).toFixed(2) + '%';
+		
 		console.log('assets : ' + per);
 		
 	}
@@ -116,6 +118,8 @@ function Loader(eventBus, onLoadComplete) {
 		var p = total1 + total2 / 100 * 150;
 		
 		loadingBar.style.width = p + 'px';
+		
+		loadingBar.innerHTML = (total1 + total2).toFixed(2) + '%';
 		
 		console.log('music : ' + per);
 		

@@ -72,6 +72,8 @@
 			text-align: center;
 			line-height: 50px;
 			background-color: #B067E7;
+			font-size: 20px;
+			color: lightgoldenrodyellow;
 		}
 		
 	</style>
@@ -80,8 +82,10 @@
 		<div id="loading">Loading...</div>
 		<div id="loadingBar"></div>
 		<script>
-			eruda.init();
-			deBug = true;
+			
+			deBug = false;
+			
+			if(deBug) eruda.init();
 			
 			var world,
 				loader,
